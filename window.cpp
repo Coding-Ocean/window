@@ -1,177 +1,57 @@
-#if 0
 #include<windows.h>
-int APIENTRY WinMain(HINSTANCE, HINSTANCE, LPSTR, INT)
+LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wp, LPARAM lp)
 {
-    MessageBox(0, "AKB", "48", 0);
-}
-#endif
+    HDC hDC;
+    PAINTSTRUCT ps;
+    RECT rect;
+    HFONT hFont;
+    HGDIOBJ hGDI;
+    const WCHAR* str = L"コーディングオーシャン";
 
-#if 0
-#include<windows.h>
-int APIENTRY WinMain(HINSTANCE, HINSTANCE, LPSTR, INT)
-{
-    HWND hWnd = CreateWindow(
-        "edit",                     //ウィンドウクラス名
-        "Coding Ocean",             //ウィンドウ名
-        WS_SYSMENU | WS_VISIBLE,    //ウィンドウスタイル
-        0, 0,                       //ウィンドウ表示XY座標
-        256, 128,                   //ウィンドウの幅と高さ
-        NULL,                       //親ウィンドウ
-        NULL,                       //ウィンドウメメニュー
-        NULL,                       //インスタンスハンドル
-        NULL                        //アプリに追加するデータ
-    );
-    //メッセージ取得・送出ループ.
-    MSG msg{};
-    while (GetMessage(&msg, NULL, 0, 0)) {
-        if (msg.message == WM_NCLBUTTONDOWN &&
-            msg.wParam == HTCLOSE) {
-            return 0;
-        }
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
-    }
-    return 0;
-}
-#endif
-
-#if 0
-#include <windows.h>
-LRESULT CALLBACK WinProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
     switch (uMsg) {
     case WM_DESTROY:
         PostQuitMessage(0);
         return 0;
-    default:
-        return DefWindowProc(hWnd, uMsg, wParam, lParam);
-    }
-}
+    case WM_PAINT: //ウィンドウの描画
+        GetClientRect(hWnd, &rect);
+        hDC = BeginPaint(hWnd, &ps);
 
-int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT)
-{
-    //ウィンドウクラスの登録
-    WNDCLASS wc{};
-    wc.lpszClassName = "GameWindow";//ウィンドウクラス名
-    wc.hInstance = hInstance;       //ＯＳが決めたこのアプリをロードするアドレス
-    wc.lpfnWndProc = WinProc;       //このウィンドウに発生したメッセージを処理する関数のアドレス
-    RegisterClass(&wc);
+        //何も設定しない状態で出力してみる
+        rect.top += DrawText(hDC, str, -1, &rect, DT_WORDBREAK);
 
-    //「ウィンドウクラスの情報」と「次のパラメータ」をもとにウィンドウをつくる
-    HWND hWnd = CreateWindow(
-        "GameWindow",               //ウィンドウクラス名
-        "Coding Ocean",             //ウィンドウ名
-        WS_OVERLAPPEDWINDOW,        //ウィンドウスタイル
-        0, 0,                       //ウィンドウ表示XY座標
-        256, 256,                   //ウィンドウの幅と高さ
-        NULL,                       //親ウィンドウ
-        NULL,                       //ウィンドウメメニュー
-        hInstance,                  //インスタンスハンドル
-        NULL                        //アプリに追加するデータ
-    );
+        hFont = CreateFont(
+            60, 0,					//高さ, 幅
+            0, 0,					//角度1, 角度2
+            FW_DONTCARE,			//太さ
+            FALSE, FALSE, FALSE,	//斜体, 下線, 打消し線
+            ANSI_CHARSET,		//文字セット
+            OUT_DEFAULT_PRECIS,		//精度
+            CLIP_DEFAULT_PRECIS,	//精度
+            DEFAULT_QUALITY,		//品質
+            DEFAULT_PITCH | FF_DONTCARE, //ピッチとファミリ
+            L"あずきフォントB");			//フォント名
+        
+        hGDI = SelectObject(hDC, hFont);
 
-    ShowWindow(hWnd, SW_SHOW);
+        SetBkMode(hDC, TRANSPARENT);
+        SetTextColor(hDC, RGB(200, 200, 0));
+        rect.top += DrawText(hDC, str, -1, &rect, DT_WORDBREAK);
 
-    //メッセージ取得・送出ループ.
-    MSG msg{};
-    while (GetMessage(&msg, NULL, 0, 0)) {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
-    }
+        SetTextColor(hDC, RGB(0, 200, 200));
 
-    return 0;
-}
-
-#endif
-
-#if 0
-#include<windows.h>
-
-LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wp, LPARAM lp)
-{
-    switch (uMsg)
-    {
-    case WM_DESTROY:
-        PostQuitMessage(0);
-        return 0;
-    default:
-        return DefWindowProc(hWnd, uMsg, wp, lp);
-    }
-}
-
-int APIENTRY WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ INT)
-{
-    const char* appName = "Coding Ocean";
-    int windowWidth = 800;
-    int windowHeight = 450;
-
-    //「ウィンドウクラス構造体」の値を設定して、ウィンドウクラスを登録する
-    HINSTANCE hInstance = GetModuleHandle(0);
-    HBRUSH hBrush = (HBRUSH)GetStockObject(BLACK_BRUSH);
-    WNDCLASSA wc{};
-    wc.lpszClassName = "GameWindow";            //ウインドウクラス名を指定
-    wc.hInstance = hInstance;                   //インスタンスハンドルを指定
-    wc.lpfnWndProc = WndProc;                   //コールバック関数を示すポインタを指定
-    wc.hbrBackground = hBrush;                  //背景用のブラシハンドルを指定
-    RegisterClass(&wc);//ここで登録！！！
-
-    //ウィンドウクラスをもとにウィンドウを作る
-    HWND hWnd = CreateWindow(
-        "GameWindow",               //上で登録したウィンドウクラス名を指定
-        appName,                    //ウィンドウタイトル名
-        WS_SYSMENU,                 //ウィンドウスタイル
-        0,                          //ウィンドウ表示位置x
-        0,                          //ウィンドウ表示位置y
-        windowWidth,                //ウィンドウの幅（ウィンドウ枠の幅を含む）
-        windowHeight,               //ウィンドウの高さ（タイトルバーとウィンドウ枠の高さを含む）
-        NULL,                       //親ウィンドウまたはオーナーウィンドウのハンドル
-        NULL,                       //メニューハンドルまたは子ウィンドウID
-        hInstance,                  //アプリケーションインスタンスのハンドル
-        NULL                        //ウィンドウに関連付けるモジュールハンドル
-    );
-
-    //ウィンドウの大きさと位置を再計算する。
-    RECT rect;
-    GetClientRect(hWnd, &rect);    //直前で作ったクライアント領域の大きさを取得
-    windowWidth += (windowWidth - rect.right);   //ウィンドウ枠の幅を加算
-    windowHeight += (windowHeight - rect.bottom); //タイトルバーおよびウィンドウ枠の高さを加算
-    //ウィンドウが中央に表示されるような表示位置を計算する。
-    int windowPosX = (GetSystemMetrics(SM_CXSCREEN) - windowWidth) / 2;
-    int windowPosY = (GetSystemMetrics(SM_CYSCREEN) - windowHeight) / 2;
-    //ウィンドウの位置と大きさを再設定
-    SetWindowPos(hWnd, 0, windowPosX, windowPosY, windowWidth, windowHeight, 0);
-
-    //ウィンドウを表示する
-    ShowWindow(hWnd, SW_SHOW);
-
-    //ゲーム用メインループ
-    MSG msg{};
-    while (true){
-        while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)){
-            if (msg.message == WM_QUIT){
-                return 0;
-            }
-            DispatchMessage(&msg);
+        WCHAR str[64];
+        wsprintf(str, L"乃木坂46");
+        for (int i = 0; i < 5; i++) {
+            TextOut(hDC, 10, 100 + 60 * i, &str[i], 1);
         }
 
-        if (GetAsyncKeyState(VK_ESCAPE)){
-            PostMessage(hWnd, WM_CLOSE, 0, 0);
-        }
 
-        Sleep(1);
-    }
 
-    return 0;
-}
-#endif 
+        SelectObject(hDC, hGDI); //フォントを元に戻す
+        DeleteObject(hFont);	//オブジェクト削除
 
-#if 0
-#include<windows.h>
-LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wp, LPARAM lp)
-{
-    switch (uMsg){
-    case WM_DESTROY:
-        PostQuitMessage(0);
+        EndPaint(hWnd, &ps);
+
         return 0;
     default:
         return DefWindowProc(hWnd, uMsg, wp, lp);
@@ -191,22 +71,22 @@ bool escKeyPressed()
 }
 void closeWindow()
 {
-    HWND hWnd = FindWindow("GameWindow", NULL);
+    HWND hWnd = FindWindow(L"GameWindow", NULL);
     PostMessage(hWnd, WM_CLOSE, 0, 0);
 }
-void createWindow(const char* appName, int windowWidth, int windowHeight)
+void createWindow(const WCHAR* appName, int windowWidth, int windowHeight)
 {
     //「ウィンドウクラス構造体」の値を設定して、ウィンドウクラスを登録する
     HINSTANCE hInstance = GetModuleHandle(NULL);
-    HBRUSH hBrush = (HBRUSH)GetStockObject(WHITE_BRUSH);
-    WNDCLASSA wc{};
+    HBRUSH hBrush = (HBRUSH)GetStockObject(BLACK_BRUSH);
+    WNDCLASS wc{};
     wc.style = CS_BYTEALIGNCLIENT;              //いくつかの定数を組み合わせてクラススタイルを指定
     wc.lpfnWndProc = WndProc;                   //コールバック関数を示すポインタを指定
     wc.hInstance = hInstance;                   //インスタンスハンドルを指定
     wc.hIcon = LoadIcon(hInstance, IDC_ICON);   //アイコンハンドルを指定
     wc.hCursor = LoadCursor(NULL, IDC_ARROW);   //カーソルハンドルを指定
     wc.hbrBackground = hBrush;                  //背景用のブラシハンドルを指定
-    wc.lpszClassName = "GameWindow";            //ウインドウクラス名を指定
+    wc.lpszClassName = L"GameWindow";            //ウインドウクラス名を指定
     RegisterClass(&wc);//ここで登録！！！
 
     //ウィンドウスタイルを決定する
@@ -217,7 +97,7 @@ void createWindow(const char* appName, int windowWidth, int windowHeight)
 
     //ウィンドウクラスをもとにウィンドウを作る
     HWND hWnd = CreateWindow(
-        "GameWindow",               //上で登録したウィンドウクラス名を指定
+        L"GameWindow",               //上で登録したウィンドウクラス名を指定
         appName,                    //ウィンドウタイトル名
         windowStyle,                //ウィンドウスタイル
         0,                          //ウィンドウ表示位置x
@@ -246,16 +126,32 @@ void createWindow(const char* appName, int windowWidth, int windowHeight)
 }
 int APIENTRY WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ INT)
 {
-    createWindow("Coding Ocean", 1920/2, 1080/2);
+    createWindow(L"Coding Ocean", 1920 / 2, 1080 / 2);
 
-    while (!quit()){
+    bool loopFlag = true;
+    while (loopFlag) {
+        if (quit()) {
+            loopFlag = false;
+            continue;
+        }
+
+        HWND hWnd = GetActiveWindow();
+
+        if (hWnd == NULL) {
+            continue;
+        }
+
         if (escKeyPressed()) {
             closeWindow();
         }
+
+        HDC hDC = GetDC(hWnd);
+        SetBkMode(hDC, TRANSPARENT);
+
+        ReleaseDC(hWnd, hDC);
 
         Sleep(1);
     }
 
     return 0;
 }
-#endif 
