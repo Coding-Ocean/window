@@ -6,52 +6,39 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wp, LPARAM lp)
     RECT rect;
     HFONT hFont;
     HGDIOBJ hGDI;
-    const WCHAR* str = L"コーディングオーシャン";
+    const WCHAR* str = L"Welcome to Coding Ocean!";
 
     switch (uMsg) {
     case WM_DESTROY:
         PostQuitMessage(0);
         return 0;
     case WM_PAINT: //ウィンドウの描画
-        GetClientRect(hWnd, &rect);
         hDC = BeginPaint(hWnd, &ps);
 
-        //何も設定しない状態で出力してみる
-        rect.top += DrawText(hDC, str, -1, &rect, DT_WORDBREAK);
-
-        hFont = CreateFont(
-            60, 0,					//高さ, 幅
-            0, 0,					//角度1, 角度2
-            FW_DONTCARE,			//太さ
-            FALSE, FALSE, FALSE,	//斜体, 下線, 打消し線
-            ANSI_CHARSET,		//文字セット
-            OUT_DEFAULT_PRECIS,		//精度
-            CLIP_DEFAULT_PRECIS,	//精度
-            DEFAULT_QUALITY,		//品質
-            DEFAULT_PITCH | FF_DONTCARE, //ピッチとファミリ
-            L"あずきフォントB");			//フォント名
-        
-        hGDI = SelectObject(hDC, hFont);
-
+        //デフォルトフォントでDrawText
         SetBkMode(hDC, TRANSPARENT);
-        SetTextColor(hDC, RGB(200, 200, 0));
+        SetTextColor(hDC, RGB(255, 255, 0));
+        GetClientRect(hWnd, &rect);
         rect.top += DrawText(hDC, str, -1, &rect, DT_WORDBREAK);
-
-        SetTextColor(hDC, RGB(0, 200, 200));
-
-        WCHAR str[64];
-        wsprintf(str, L"乃木坂46");
-        for (int i = 0; i < 5; i++) {
-            TextOut(hDC, 10, 100 + 60 * i, &str[i], 1);
-        }
-
-
-
+        //フォントを作ってからのDrawText
+        hFont = CreateFont(
+            60, 0,					    //高さ, 幅
+            0, 0,					    //角度1, 角度2
+            FW_DONTCARE,			    //太さ
+            FALSE, FALSE, FALSE,	    //斜体, 下線, 打消し線
+            ANSI_CHARSET,		        //文字セット
+            OUT_DEFAULT_PRECIS,	        //精度
+            CLIP_DEFAULT_PRECIS,	    //精度
+            DEFAULT_QUALITY,		    //品質
+            DEFAULT_PITCH | FF_DONTCARE,//ピッチとファミリ
+            L"Bauhaus 93"               //フォント名
+        );		
+        hGDI = SelectObject(hDC, hFont);//現在の設定をとっておく
+        rect.top += DrawText(hDC, str, -1, &rect, DT_WORDBREAK);
         SelectObject(hDC, hGDI); //フォントを元に戻す
         DeleteObject(hFont);	//オブジェクト削除
 
         EndPaint(hWnd, &ps);
-
         return 0;
     default:
         return DefWindowProc(hWnd, uMsg, wp, lp);
@@ -134,21 +121,12 @@ int APIENTRY WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ INT)
             loopFlag = false;
             continue;
         }
-
-        HWND hWnd = GetActiveWindow();
-
-        if (hWnd == NULL) {
+        if (GetActiveWindow() == NULL) {
             continue;
         }
-
         if (escKeyPressed()) {
             closeWindow();
         }
-
-        HDC hDC = GetDC(hWnd);
-        SetBkMode(hDC, TRANSPARENT);
-
-        ReleaseDC(hWnd, hDC);
 
         Sleep(1);
     }
